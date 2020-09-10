@@ -1,0 +1,318 @@
+# Copyright Istio Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+##################################################################################################
+# This file defines the services, service accounts, and deployments for the Bookinfo sample.
+#
+# To apply all 4 Bookinfo services, their corresponding service accounts, and deployments:
+#
+#   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
+#
+# Alternatively, you can deploy any resource separately:
+#
+#   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml -l service=reviews # reviews Service
+#   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml -l account=reviews # reviews ServiceAccount
+#   kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml -l app=reviews,version=v3 # reviews-v3 Deployment
+##################################################################################################
+
+##################################################################################################
+# Details service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: details
+  labels:
+    app: details
+    service: details
+spec:
+  ports:
+      # The service will listen at port 3002
+    - port: 3002
+      name: tcp
+      protocol: TCP
+      # this service will forward traffic to container's port 3002
+      targetPort: 3002
+  selector:
+    # which pod will be called is decided by the selector. Here pod with label app=details will be called.
+    # Pods are created below as part of deployment.
+    app: details
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-details
+  labels:
+    account: details
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: details-v1
+  labels:
+    app: details
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: details
+      version: v1
+  template:
+    metadata:
+      labels:
+        # this label will be assigned to all pods created under this deployment
+        app: details
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-details
+      containers:
+        - name: details
+          image: docker.io/devnryn/details:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3002
+---
+##################################################################################################
+# Ratings service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratings
+  # label for this service
+  labels:
+    app: ratings
+    service: ratings
+spec:
+  ports:
+      # port exposed by the service for use within the cluster
+    - port: 3003
+      name: tcp
+      # port of the container where traffic will be forwarded to
+      targetPort: 3003
+      protocol: TCP
+  selector:
+    # which pod will be called is decided by the selector. Here pod with label app=ratings will be called.
+    # Pods are created below as part of deployment.
+    app: ratings
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-ratings
+  labels:
+    account: ratings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings-v1
+  # label for this deployment
+  labels:
+    app: ratings
+    version: v1
+spec:
+  # only one pod will run under this deployment
+  replicas: 1
+  selector:
+    # pod with following labels will be selected as part of this deployment. The label is assigned to pods below in template
+    matchLabels:
+      app: ratings
+      version: v1
+  template:
+    metadata:
+      # this label will be assigned to all pods created under this deployment
+      labels:
+        app: ratings
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-ratings
+      containers:
+        - name: ratings
+          image: docker.io/devnryn/ratings:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3003
+---
+##################################################################################################
+# Reviews service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews
+  # label for this service
+  labels:
+    app: reviews
+    service: reviews
+spec:
+  ports:
+      # port exposed by this service for use within the cluster
+    - port: 3001
+      name: tcp
+      # targetPort is container port where this service will forward the request to
+      targetPort: 3001
+      protocol: TCP
+  selector:
+    # pods with following labels will be serviced by this Service. Pods are created below as part of deployment.
+    app: reviews
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-reviews
+  labels:
+    account: reviews
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v1
+  # labels for this deployment
+  labels:
+    app: reviews
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    # pod with following labels will be selected as part of this deployment. The label is assigned to pods below in template
+    matchLabels:
+      app: reviews
+      version: v1
+  template:
+    metadata:
+      labels:
+        # following labels are assigned to the pods created under this deployment
+        app: reviews
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-reviews
+      containers:
+        - name: reviews
+          image: docker.io/devnryn/reviews:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v2
+  # label for this deployment
+  labels:
+    app: reviews
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    # pods with following labels will fall under this deployment
+    matchLabels:
+      app: reviews
+      version: v2
+  template:
+    metadata:
+      # following labels are being assigned to the pods
+      labels:
+        app: reviews
+        version: v2
+    spec:
+      serviceAccountName: bookinfo-reviews
+      containers:
+        - name: reviews
+          image: docker.io/devnryn/reviews:v2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v3
+  labels:
+    app: reviews
+    version: v3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews
+      version: v3
+  template:
+    metadata:
+      labels:
+        app: reviews
+        version: v3
+    spec:
+      serviceAccountName: bookinfo-reviews
+      containers:
+        - name: reviews
+          image: docker.io/devnryn/reviews:v3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+---
+##################################################################################################
+# Productpage services
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: productpage
+  labels:
+    app: productpage
+    service: productpage
+spec:
+  ports:
+    - port: 3000
+      name: tcp
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app: productpage
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-productpage
+  labels:
+    account: productpage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage-v1
+  labels:
+    app: productpage
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productpage
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: productpage
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-productpage
+      containers:
+        - name: productpage
+          image: docker.io/devnryn/productpage:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+---
