@@ -1,24 +1,11 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: productpage
-spec:
-  hosts:
-  - productpage
-  http:
-  - route:
-    - destination:
-        host: productpage
-        subset: v1
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
   name: reviews
 spec:
   hosts:
   - reviews
-  http:
+  tcp:
   - route:
     - destination:
         host: reviews
@@ -31,7 +18,7 @@ metadata:
 spec:
   hosts:
   - ratings
-  http:
+  tcp:
   - route:
     - destination:
         host: ratings
@@ -44,7 +31,7 @@ metadata:
 spec:
   hosts:
   - details
-  http:
+  tcp:
   - route:
     - destination:
         host: details

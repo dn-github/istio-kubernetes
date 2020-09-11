@@ -9,7 +9,7 @@ spec:
     - port:
         # don't change this. default istio controller port is 80
         number: 80
-        name: tcp
+        name: grpc
         protocol: TCP
       hosts:
         - "*"
@@ -20,12 +20,12 @@ metadata:
   name: bookinfo
 spec:
   hosts:
-    - "*"
+    - productpage
   gateways:
     - bookinfo-gateway
   tcp:
     - route:
-        - destination:
-            host: productpage
-            port:
-              number: 3000
+      - destination:
+          host: productpage
+          port:
+            number: 3000
