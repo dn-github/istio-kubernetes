@@ -40,7 +40,7 @@ spec:
   ports:
       # The service will listen at port 3002
     - port: 3002
-      name: tcp
+      name: grpc
       protocol: TCP
       # this service will forward traffic to container's port 3002
       targetPort: 3002
@@ -99,7 +99,7 @@ spec:
   ports:
       # port exposed by the service for use within the cluster
     - port: 3003
-      name: tcp
+      name: grpc
       # port of the container where traffic will be forwarded to
       targetPort: 3003
       protocol: TCP
@@ -159,15 +159,12 @@ metadata:
     service: reviews
 spec:
   ports:
-      # port exposed by this service for use within the cluster
-    - port: 3001
-      name: tcp
-      # targetPort is container port where this service will forward the request to
-      targetPort: 3001
+    - port: 3001 # port exposed by this service for use within the cluster
+      name: grpc
+      targetPort: 3001 # targetPort is container port where this service will forward the request to
       protocol: TCP
   selector:
-    # pods with following labels will be serviced by this Service. Pods are created below as part of deployment.
-    app: reviews
+    app: reviews # pods with following labels will be serviced by this Service. Pods are created below as part of deployment.
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -276,7 +273,7 @@ metadata:
 spec:
   ports:
     - port: 3000
-      name: tcp
+      name: grpc
       targetPort: 3000
       protocol: TCP
   selector:
