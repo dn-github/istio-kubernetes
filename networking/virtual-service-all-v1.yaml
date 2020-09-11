@@ -5,7 +5,7 @@ metadata:
 spec:
   hosts:
   - reviews
-  tcp:
+  http:
   - route:
     - destination:
         host: reviews
