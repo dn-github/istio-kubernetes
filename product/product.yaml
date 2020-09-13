@@ -82,7 +82,8 @@ spec:
           image: docker.io/devnryn/details:v1
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3002
+            - name: grpc
+              containerPort: 3002
 ---
 ##################################################################################################
 # Ratings service
@@ -144,7 +145,8 @@ spec:
           image: docker.io/devnryn/ratings:v1
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3003
+            - name: grpc
+              containerPort: 3003
 ---
 ##################################################################################################
 # Reviews service
@@ -201,7 +203,8 @@ spec:
           image: docker.io/devnryn/reviews:v1
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3001
+            - name: grpc
+              containerPort: 3001
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -231,7 +234,8 @@ spec:
           image: docker.io/devnryn/reviews:v2
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3001
+            - name: grpc
+              containerPort: 3001
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -258,7 +262,8 @@ spec:
           image: docker.io/devnryn/reviews:v3
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3001
+            - name: grpc
+              containerPort: 3001
 ---
 ##################################################################################################
 # Productpage services
@@ -311,5 +316,6 @@ spec:
           image: docker.io/devnryn/productpage:v1
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3000
+            - name: grpc
+              containerPort: 3000
 ---
