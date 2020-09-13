@@ -4,15 +4,15 @@ metadata:
   name: bookinfo-gateway
 spec:
   selector:
-    istio: ingressgateway # use istio default controller
+    istio: ingressgateway # use istio default controller. This selector means this gateway config will be applied to specific set of pods ingress-pods
   servers:
     - port:
-        # don't change this. default istio controller port is 80
-        number: 80
-        name: grpc
+        # don't change this. Default istio controller port is 80
+        number: 8080  # we want ingress gateway to be available on port 80
+        name: grpc-bookinfo # this can be any name. sometimes the prefix is important
         protocol: TCP
       hosts:
-        - "*"
+        - "*"   # dnsNames which are exposed by this gateway. * means dnsName of all virtualService hosts are exposed
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
@@ -20,9 +20,9 @@ metadata:
   name: bookinfo
 spec:
   hosts:
-    - productpage
+    - productpage  # traffic targeted to this host will be routed to destination 'productpage' on port 3000
   gateways:
-    - bookinfo-gateway
+    - bookinfo-gateway  #specifies that only requests through your bookinfo-gateway are allowed
   tcp:
     - route:
       - destination:
