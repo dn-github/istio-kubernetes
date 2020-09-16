@@ -1,0 +1,59 @@
+##################################################################################################
+# Details service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: details
+  labels:
+    app: details
+    service: details
+spec:
+  ports:
+    # The service will listen at port 3002
+    - port: 3002
+      name: grpc
+      protocol: TCP
+      # this service will forward traffic to container's port 3002
+      targetPort: 3002
+  selector:
+    # which pod will be called is decided by the selector. Here pod with label app=details will be called.
+    # Pods are created below as part of deployment.
+    app: details
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-details
+  labels:
+    account: details
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: details-v1
+  labels:
+    app: details
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: details
+      version: v1
+  template:
+    metadata:
+      labels:
+        # this label will be assigned to all pods created under this deployment
+        app: details
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-details
+      containers:
+        - name: details
+          image: docker.io/devnryn/details:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 3002
+---

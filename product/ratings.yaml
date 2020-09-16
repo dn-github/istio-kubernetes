@@ -1,0 +1,63 @@
+##################################################################################################
+# Ratings service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratings
+  # label for this service
+  labels:
+    app: ratings
+    service: ratings
+spec:
+  ports:
+    # port exposed by the service for use within the cluster
+    - port: 3003
+      name: grpc
+      # port of the container where traffic will be forwarded to
+      targetPort: 3003
+      protocol: TCP
+  selector:
+    # which pod will be called is decided by the selector. Here pod with label app=ratings will be called.
+    # Pods are created below as part of deployment.
+    app: ratings
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-ratings
+  labels:
+    account: ratings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings-v1
+  # label for this deployment
+  labels:
+    app: ratings
+    version: v1
+spec:
+  # only one pod will run under this deployment
+  replicas: 1
+  selector:
+    # pod with following labels will be selected as part of this deployment. The label is assigned to pods below in template
+    matchLabels:
+      app: ratings
+      version: v1
+  template:
+    metadata:
+      # this label will be assigned to all pods created under this deployment
+      labels:
+        app: ratings
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-ratings
+      containers:
+        - name: ratings
+          image: docker.io/devnryn/ratings:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 3003
+---
