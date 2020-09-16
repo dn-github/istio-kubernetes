@@ -1,9 +1,12 @@
 apiVersion: "security.istio.io/v1beta1"
 kind: "AuthorizationPolicy"
 metadata:
-  name: "global-allow"
+  name: "productpage-allow"
   namespace: default
 spec:
+  selector:
+    matchLabels:
+      app: productpage
   rules:
     - to:
         - operation:
